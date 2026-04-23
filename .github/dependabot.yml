@@ -1,0 +1,13 @@
+version: 2
+updates:
+  # Customize ecosystems for your project:
+  #   pip, npm, nuget, docker, github-actions, etc.
+  # See: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
