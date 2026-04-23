@@ -78,13 +78,13 @@ bool initCamera() {
     config.grab_mode = CAMERA_GRAB_WHEN_EMPTY;  // capture on demand, not continuous DMA
 
     if (psramFound()) {
-        config.frame_size = FRAMESIZE_VGA;
-        config.jpeg_quality = 20;
-        config.fb_count = 1;               // single buffer — no background DMA
+        config.frame_size = FRAMESIZE_XGA;  // 1024x768 — good detail for car detection
+        config.jpeg_quality = 12;           // sharper edges, ~40-80KB per frame
+        config.fb_count = 1;
         config.fb_location = CAMERA_FB_IN_PSRAM;
     } else {
         config.frame_size = FRAMESIZE_VGA;
-        config.jpeg_quality = 20;
+        config.jpeg_quality = 15;
         config.fb_count = 1;
         config.fb_location = CAMERA_FB_IN_DRAM;
     }
@@ -95,16 +95,21 @@ bool initCamera() {
         return false;
     }
 
-    // Start at VGA for streaming — good balance of quality vs speed
     sensor_t *s = esp_camera_sensor_get();
-    s->set_framesize(s, FRAMESIZE_VGA);
+    s->set_framesize(s, FRAMESIZE_XGA);
     s->set_vflip(s, 0);
     s->set_hmirror(s, 0);
-    s->set_brightness(s, 1);      // -2 to 2
+    // Exposure
+    s->set_brightness(s, 1);      // -2 to 2, slight boost for outdoor
     s->set_exposure_ctrl(s, 1);   // auto exposure on
     s->set_aec2(s, 1);            // auto exposure DSP on
     s->set_gain_ctrl(s, 1);       // auto gain on
+    // Color
+    s->set_whitebal(s, 1);        // auto white balance on
     s->set_awb_gain(s, 1);        // auto white balance gain on
+    s->set_contrast(s, 1);        // slight boost — helps car outlines vs pavement
+    s->set_saturation(s, -1);     // slightly desat — reduces color noise in low light
+    s->set_denoise(s, 1);         // OV2640 built-in denoise
 
     return true;
 }
